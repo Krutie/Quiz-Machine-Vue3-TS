@@ -12,7 +12,7 @@ export interface QuizContext {
   correct: number;
   incorrect: number;
   errorMessage?: string;
-  answer: Answer;
+  answer?: Answer;
   totalQuestions: number;
 }
 
@@ -72,7 +72,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
       correct: 0,
       incorrect: 0,
       errorMessage: "",
-      answer: { picked: null, value: false },
+      // answer: { picked: null, value: false },
       totalQuestions: 0
     },
     states: {
@@ -175,10 +175,10 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
         return context.currentQuestion < context.totalQuestions;
       },
       isCorrect: (ctx: QuizContext) => {
-        return ctx.answer.picked === ctx.answer.value;
+        return ctx.answer?.picked === ctx.answer?.value;
       },
       isIncorrect: (ctx: QuizContext) => {
-        return ctx.answer.picked !== ctx.answer.value;
+        return ctx.answer?.picked !== ctx.answer?.value;
       }
     },
     actions: {

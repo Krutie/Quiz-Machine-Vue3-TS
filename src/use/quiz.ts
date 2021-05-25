@@ -47,21 +47,6 @@ export default function quiz(Questions: Question[]) {
     () => !state.value.matches("initial") && !state.value.matches("finish")
   );
 
-  // to disable radio buttons once answered
-  // check if current state matches correct or incorrect
-  // const data: QuizState[];
-  //  = [{ value: "correct", context: QuizContext }, { value: "incorrect", context: {} }]
-  // const data: QuizState = ['correct', 'incorrect'];
-  
-  const context = {
-    currentQuestion: 0,
-    correct: 0,
-    incorrect: 0,
-    errorMessage: "",
-    answer: { picked: null, value: false },
-    totalQuestions: 0
-  }
-
   const resultStates = ["correct", "incorrect"] as const;
   const isAnswered = computed<boolean>(() => resultStates.some(state.value.matches));
 
