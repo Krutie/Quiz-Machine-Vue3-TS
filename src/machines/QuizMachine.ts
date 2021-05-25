@@ -1,11 +1,6 @@
 /* eslint-disable */
 import { createMachine, assign, StateSchema, DoneInvokeEvent } from "xstate";
 
-// export interface Answer {
-//   picked?: boolean | null;
-//   value?: boolean;
-// }
-
 export interface Answer {
   picked: boolean | null;
   value: boolean;
@@ -26,7 +21,6 @@ type AnsweringState = { value: "answering"; context: QuizContext };
 type IdleState = { value: "answering.idle"; context: QuizContext };
 type SubmittingState = { value: "submitting"; context: QuizContext };
 type CompleteState = { value: "complete"; context: QuizContext };
-
 type CheckingState = { value: "checking"; context: QuizContext };
 type CorrectState = { value: "correct"; context: QuizContext };
 type IncorrectState = { value: "incorrect"; context: QuizContext };
@@ -77,7 +71,6 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
       correct: 0,
       incorrect: 0,
       errorMessage: "",
-      // answer: { picked: null, value: false },
       totalQuestions: 0
     },
     states: {
@@ -102,21 +95,13 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
             on: {
               ANSWER: {
                 target: "submitting",
-                // actions: assign < QuizContext, DoneInvokeEvent<Answer>>({
-                //   answer: (context, event) => event.data
-                // })
-                // actions: assign((context, event) => {
-                //   return event.type === "ANSWER" 
-                //     ? { answer: event.answer }
-                //     : { }
-                // })
               }
             }
           },
           submitting: {
             invoke: {
               src: validateAnswer,
-              id: "validate-answer",
+              id: "validateAnswer",
               onDone: {
                 target: "complete",
                 actions: assign<QuizContext, DoneInvokeEvent<Answer>>({
@@ -125,8 +110,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
               },
               onError: {
                 target: "idle",
-                actions: assign((context, event) => {
-                  console.log(event)
+                actions: assign<QuizContext, DoneInvokeEvent<any>>((context, event) => {
                     return {
                       errorMessage: event.data.message
                     };
@@ -144,7 +128,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
           {
             target: "correct",
             cond: "isCorrect",
-            actions: assign((context: QuizContext) => {
+            actions: assign<QuizContext, QuizEvent>((context) => {
               return {
                 correct: context.correct + 1
               };
@@ -153,7 +137,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
           {
             target: "incorrect",
             cond: "isIncorrect",
-            actions: assign((context: QuizContext) => {
+            actions: assign<QuizContext, QuizEvent>((context) => {
               return {
                 incorrect: context.incorrect + 1
               };
