@@ -1,9 +1,14 @@
 /* eslint-disable */
-import { createMachine, assign, StateSchema } from "xstate";
+import { createMachine, assign, StateSchema, DoneInvokeEvent } from "xstate";
+
+// export interface Answer {
+//   picked?: boolean | null;
+//   value?: boolean;
+// }
 
 export interface Answer {
-  picked?: boolean | null;
-  value?: boolean;
+  picked: boolean | null;
+  value: boolean;
 }
 
 // The context (extended state) of the machine
@@ -97,11 +102,14 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
             on: {
               ANSWER: {
                 target: "submitting",
-                actions: assign((context, event) => {
-                  return event.type === "ANSWER" 
-                    ? { answer: event.answer }
-                    : { }
-                })
+                // actions: assign < QuizContext, DoneInvokeEvent<Answer>>({
+                //   answer: (context, event) => event.data
+                // })
+                // actions: assign((context, event) => {
+                //   return event.type === "ANSWER" 
+                //     ? { answer: event.answer }
+                //     : { }
+                // })
               }
             }
           },
@@ -110,11 +118,15 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
               src: validateAnswer,
               id: "validate-answer",
               onDone: {
-                target: "complete"
+                target: "complete",
+                actions: assign<QuizContext, DoneInvokeEvent<Answer>>({
+                  answer: (context, event) => event.data
+                })
               },
               onError: {
                 target: "idle",
                 actions: assign((context, event) => {
+                  console.log(event)
                     return {
                       errorMessage: event.data.message
                     };
@@ -132,7 +144,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
           {
             target: "correct",
             cond: "isCorrect",
-            actions: assign((context: QuizContext, event) => {
+            actions: assign((context: QuizContext) => {
               return {
                 correct: context.correct + 1
               };
@@ -141,7 +153,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
           {
             target: "incorrect",
             cond: "isIncorrect",
-            actions: assign((context: QuizContext, event) => {
+            actions: assign((context: QuizContext) => {
               return {
                 incorrect: context.incorrect + 1
               };
@@ -166,7 +178,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
   },
   {
     guards: {
-      newTotalQuestionsIsValidValue: (context, event: QuizEvent) => {
+      newTotalQuestionsIsValidValue: (context: QuizContext, event: QuizEvent) => {
         if (event.type !== "START") return false;
 
         return event.totalQuestions > 0;
@@ -188,7 +200,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
       goToNextQuestion: assign((context: QuizContext) => {
         return { currentQuestion: context.currentQuestion + 1}
       }),
-      assignTotalQuestionsToContext: assign((context, event: QuizEvent) => {
+      assignTotalQuestionsToContext: assign((context: QuizContext, event: QuizEvent) => {
         if (event.type !== "START") return {};
         // questions array starts from index 0
         // reduce one from the total length of questions array
