@@ -14,7 +14,7 @@ import {
   finish,
   idle,
   correct
-} from "../components/feedback/";
+} from "../components/feedback-components/";
 
 // INTERFACE
 

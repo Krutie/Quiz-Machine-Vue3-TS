@@ -47,15 +47,15 @@
 import { defineComponent, toRefs } from "vue";
 
 // child components
-import instructions from "./components/instructions.vue";
-import feedback from "./components/feedback.vue";
-import score from "./components/score.vue";
-import actions from "./components/actions.vue";
+import instructions from "./instructions.vue";
+import feedback from "./feedback.vue";
+import score from "./score.vue";
+import actions from "./actions.vue";
 // usable
-import useQuiz from "./use/quiz";
+import useQuiz from "../use/quiz";
 
-// fetch questions
-import { fetchQuestions } from "./data";
+//
+import { fetchQuestions } from "../data";
 
 export default defineComponent({
   name: "Quiz",
