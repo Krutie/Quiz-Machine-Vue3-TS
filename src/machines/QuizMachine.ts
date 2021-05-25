@@ -7,7 +7,7 @@ export interface Answer {
 }
 
 // The context (extended state) of the machine
-interface QuizContext {
+export interface QuizContext {
   currentQuestion: number;
   correct: number;
   incorrect: number;

@@ -3,7 +3,9 @@ import { ref, computed, watchEffect, Component } from "vue";
 
 // XSTATE
 import { useMachine } from "@xstate/vue";
-import { QuizMachine, QuizEvent } from "../machines/QuizMachine";
+import { QuizMachine, QuizEvent, QuizState, QuizContext } from "../machines/QuizMachine";
+import { Typestate  } from 'xstate';
+
 
 // Feedback (Vue) components
 import {
@@ -47,10 +49,21 @@ export default function quiz(Questions: Question[]) {
 
   // to disable radio buttons once answered
   // check if current state matches correct or incorrect
-  const isAnswered = computed<boolean>(() =>
-    state.value.matches("correct") || state.value.matches("incorrect")
-    // ["correct", "incorrect"].some(state.value.matches)
-  );
+  // const data: QuizState[];
+  //  = [{ value: "correct", context: QuizContext }, { value: "incorrect", context: {} }]
+  // const data: QuizState = ['correct', 'incorrect'];
+  
+  const context = {
+    currentQuestion: 0,
+    correct: 0,
+    incorrect: 0,
+    errorMessage: "",
+    answer: { picked: null, value: false },
+    totalQuestions: 0
+  }
+
+  const resultStates = ["correct", "incorrect"] as const;
+  const isAnswered = computed<boolean>(() => resultStates.some(state.value.matches));
 
   // current question based on context value defined in Quiz machine
   const currentQuestion = computed<Question>(
@@ -118,9 +131,7 @@ export default function quiz(Questions: Question[]) {
   ];
 
   // show active button based on state value
-  const activeButton = computed(() =>
-    actions.find(action => action.cond(state))
-  );
+  const activeButton = computed<Action | undefined>(() => actions.find(action => action.cond(state)));
 
   // return properties and methods to control the UI
   return {
