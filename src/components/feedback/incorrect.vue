@@ -1,4 +1,3 @@
-
 <template>
   <svg width="1em" height="1em" viewBox="0 0 16 16">
     <path
@@ -10,6 +9,6 @@
 
 <script>
 export default {
-  name: "incorrect",
+  name: "incorrect"
 };
 </script>

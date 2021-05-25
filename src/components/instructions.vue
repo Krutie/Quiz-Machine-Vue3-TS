@@ -9,6 +9,6 @@
 </template>
 <script>
 export default {
-  props: ["state"],
+  props: ["state"]
 };
 </script>

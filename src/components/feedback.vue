@@ -10,6 +10,6 @@
 </template>
 <script>
 export default {
-  props: ["state", "currentFeedback"],
+  props: ["state", "currentFeedback"]
 };
 </script>

@@ -1,9 +1,9 @@
-// Vue 3
+/* eslint-disable */
 import { ref, computed, watchEffect, Component } from "vue";
 
 // XSTATE
 import { useMachine } from "@xstate/vue";
-import { QuizMachine } from "../machines/QuizMachine";
+import { QuizMachine, QuizEvent } from "../machines/QuizMachine";
 
 // Feedback (Vue) components
 import {
@@ -16,25 +16,24 @@ import {
 
 // INTERFACE
 
-interface question {
+interface Question {
   text: string;
   answer: boolean;
 }
-interface action {
+interface Action {
   label: string;
-  state: string;
   cond: (state: any) => any;
   action: () => void;
 }
 
-interface feedback {
+interface Feedback {
   state: string;
   mood: Component;
   color: string;
 }
 // ==============
 
-export default function quiz(Questions: question[]) {
+export default function quiz(Questions: Question[]) {
   // initialise xstate machine
   const { state, send } = useMachine(QuizMachine, { devTools: true });
 
@@ -49,11 +48,12 @@ export default function quiz(Questions: question[]) {
   // to disable radio buttons once answered
   // check if current state matches correct or incorrect
   const isAnswered = computed<boolean>(() =>
-    ["correct", "incorrect"].some(state.value.matches)
+    state.value.matches("correct") || state.value.matches("incorrect")
+    // ["correct", "incorrect"].some(state.value.matches)
   );
 
   // current question based on context value defined in Quiz machine
-  const currentQuestion = computed<question>(
+  const currentQuestion = computed<Question>(
     () => Questions[state.value.context.currentQuestion]
   );
 
@@ -70,7 +70,7 @@ export default function quiz(Questions: question[]) {
   // default feedback object map
   const defaultFeedback = { state: "initial", mood: idle, color: "#a27ae8" };
 
-  const newFeedbackMap: feedback[] = [
+  const newFeedbackMap: Feedback[] = [
     { state: "initial", mood: idle, color: "#a27ae8" },
     { state: "answering.idle", mood: answering, color: "#FCCB7E" },
     { state: "correct", mood: correct, color: "#50b97e" },
@@ -78,8 +78,8 @@ export default function quiz(Questions: question[]) {
     { state: "finish", mood: finish, color: "#a27ae8" }
   ];
 
-  const currentFeedback = computed<feedback>(() => {
-    const matched = newFeedbackMap.filter((feedback) =>
+  const currentFeedback = computed<Feedback>(() => {
+    const matched = newFeedbackMap.filter(feedback =>
       state.value.toStrings().includes(feedback.state)
     );
     return matched.length === 1 ? matched[0] : defaultFeedback;
@@ -88,22 +88,19 @@ export default function quiz(Questions: question[]) {
   // ACTIONS ======================================
 
   // Array below decides which button to show based on current state
-  // }
-  const actions: action[] = [
+  const actions: Action[] = [
     {
       label: "START",
-      state: "initial",
-      cond: (state) => state.value.matches("initial"),
+      cond: state => state.value.matches("initial"),
       action: () =>
         send({
           type: "START",
           totalQuestions: Questions.length
-        })
+        } as QuizEvent)
     },
     {
       label: "ANSWER",
-      state: "answering.idle",
-      cond: (state) => state.value.matches("answering.idle"),
+      cond: state => state.value.matches("answering.idle"),
       action: () =>
         send({
           type: "ANSWER",
@@ -111,18 +108,18 @@ export default function quiz(Questions: question[]) {
             picked: picked.value,
             value: currentQuestion.value.answer
           }
-        })
+        } as QuizEvent)
     },
     {
       label: "NEXT",
-      cond: (state) => ["correct", "incorrect"].some(state.value.matches),
+      cond: state => ["correct", "incorrect"].some(state.value.matches),
       action: () => send({ type: "NEXT_QUESTION" })
     }
   ];
 
   // show active button based on state value
   const activeButton = computed(() =>
-    actions.find((action) => action.cond(state))
+    actions.find(action => action.cond(state))
   );
 
   // return properties and methods to control the UI

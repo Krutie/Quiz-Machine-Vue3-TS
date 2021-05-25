@@ -8,6 +8,6 @@
 </template>
 <script>
 export default {
-  props: ["state", "activeButton"],
+  props: ["state", "activeButton"]
 };
 </script>

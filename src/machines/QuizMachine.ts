@@ -1,45 +1,52 @@
-import { Machine, assign, StateSchema } from "xstate";
+/* eslint-disable */
+import { createMachine, assign, StateSchema } from "xstate";
+
+export interface Answer {
+  picked?: boolean | null;
+  value?: boolean;
+}
 
 // The context (extended state) of the machine
 interface QuizContext {
   currentQuestion: number;
   correct: number;
   incorrect: number;
-  errorMessage: string;
+  errorMessage?: string;
+  answer: Answer;
+  totalQuestions: number;
 }
 
-// Available states of Quiz Machine
-export interface QuizStateSchema {
-  states: {
-    initial: {
-      states: {
-        answering: {
-          idle: {}
-          submitting: {}
-          complete: {}
-        }
-      }
-    checking: {}
-    correct: {}
-    incorrect: {}
-    finish: {}
-  };
-}
+type InitialState = { value: "initial"; context: QuizContext };
+type AnsweringState = { value: "answering"; context: QuizContext };
+type IdleState = { value: "answering.idle"; context: QuizContext };
+type SubmittingState = { value: "submitting"; context: QuizContext };
+type CompleteState = { value: "complete"; context: QuizContext };
 
-export const START_EVENT = { type: "START" };
-export const ANSWER_EVENT = { type: "ANSWER", answer: Boolean };
-export const NEXT_QUESTION_EVENT = { type: "NEXT_QUESTION" };
+type CheckingState = { value: "checking"; context: QuizContext };
+type CorrectState = { value: "correct"; context: QuizContext };
+type IncorrectState = { value: "incorrect"; context: QuizContext };
+type FinishState = { value: "finish"; context: QuizContext };
 
-// The events that the machine handles
+export type QuizState =
+  | InitialState
+  | AnsweringState
+  | IdleState
+  | SubmittingState
+  | CompleteState
+  | CheckingState
+  | CorrectState
+  | IncorrectState
+  | FinishState;
+
 export type QuizEvent =
-  | typeof START_EVENT
-  | typeof ANSWER_EVENT
-  | typeof NEXT_QUESTION_EVENT;
+  | { type: "START"; totalQuestions: number }
+  | { type: "ANSWER"; answer?: Answer }
+  | { type: "NEXT_QUESTION" };
 
 // Validate answer
-const validateAnswer = (ctx: any, evt: any) =>
+const validateAnswer = (ctx: QuizContext, evt: QuizEvent) =>
   new Promise((resolve, reject) => {
-    if (evt.answer.picked !== null) {
+    if (evt.type === "ANSWER" && evt.answer?.picked !== null) {
       resolve(evt.answer);
     } else {
       reject(new Error("Please select answer."));
@@ -56,7 +63,7 @@ const NEXT_Q = [
   { target: "finish" }
 ];
 
-export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
+export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
   {
     id: "quiz",
     initial: "initial",
@@ -64,7 +71,9 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
       currentQuestion: 0,
       correct: 0,
       incorrect: 0,
-      errorMessage: ""
+      errorMessage: "",
+      answer: { picked: null, value: false },
+      totalQuestions: 0
     },
     states: {
       initial: {
@@ -89,9 +98,9 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
               ANSWER: {
                 target: "submitting",
                 actions: assign((context, event) => {
-                  return {
-                    answer: event.answer
-                  };
+                  return event.type === "ANSWER" 
+                    ? { answer: event.answer }
+                    : { }
                 })
               }
             }
@@ -106,9 +115,9 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
               onError: {
                 target: "idle",
                 actions: assign((context, event) => {
-                  return {
-                    errorMessage: event.data.message
-                  };
+                    return {
+                      errorMessage: event.data.message
+                    };
                 })
               }
             }
@@ -123,7 +132,7 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
           {
             target: "correct",
             cond: "isCorrect",
-            actions: assign((context, event) => {
+            actions: assign((context: QuizContext, event) => {
               return {
                 correct: context.correct + 1
               };
@@ -132,7 +141,7 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
           {
             target: "incorrect",
             cond: "isIncorrect",
-            actions: assign((context, event) => {
+            actions: assign((context: QuizContext, event) => {
               return {
                 incorrect: context.incorrect + 1
               };
@@ -157,33 +166,29 @@ export const QuizMachine = Machine<QuizContext, QuizStateSchema, QuizEvent>(
   },
   {
     guards: {
-      newTotalQuestionsIsValidValue: (context, event) => {
+      newTotalQuestionsIsValidValue: (context, event: QuizEvent) => {
         if (event.type !== "START") return false;
 
         return event.totalQuestions > 0;
       },
-      canGoToNextQuestion: (context) => {
+      canGoToNextQuestion: (context:QuizContext) => {
         return context.currentQuestion < context.totalQuestions;
       },
-      isCorrect: (ctx, event) => {
-        if (ctx.answer.picked === ctx.answer.value) {
-          return true;
-        }
+      isCorrect: (ctx: QuizContext) => {
+        return ctx.answer.picked === ctx.answer.value;
       },
-      isIncorrect: (ctx, event) => {
-        if (ctx.answer.picked !== ctx.answer.value) {
-          return true;
-        }
+      isIncorrect: (ctx: QuizContext) => {
+        return ctx.answer.picked !== ctx.answer.value;
       }
     },
     actions: {
-      clearErrorMessage: assign({
-        errorMessage: () => undefined
+      clearErrorMessage: assign((context: QuizContext) => {
+        return { errorMessage: undefined }
       }),
-      goToNextQuestion: assign({
-        currentQuestion: (context, event) => context.currentQuestion + 1
+      goToNextQuestion: assign((context: QuizContext) => {
+        return { currentQuestion: context.currentQuestion + 1}
       }),
-      assignTotalQuestionsToContext: assign((context, event) => {
+      assignTotalQuestionsToContext: assign((context, event: QuizEvent) => {
         if (event.type !== "START") return {};
         // questions array starts from index 0
         // reduce one from the total length of questions array

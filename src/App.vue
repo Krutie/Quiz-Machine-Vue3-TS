@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 // data
 import questions from "./assets/questions.json";
 // child components
@@ -55,19 +55,19 @@ import actions from "./components/actions";
 // usable
 import useQuiz from "./use/quiz";
 
-export default defineComponent ({
+export default defineComponent({
   name: "App",
   components: {
     instructions,
     score,
     feedback,
-    actions,
+    actions
   },
   props: {
     data: {
       type: Array,
-      default: questions,
-    },
+      default: questions
+    }
   },
   setup(props) {
     const {
@@ -78,7 +78,7 @@ export default defineComponent ({
       isAnswered,
       currentQuestion,
       currentFeedback,
-      activeButton,
+      activeButton
     } = useQuiz(props.data);
 
     return {
@@ -90,10 +90,9 @@ export default defineComponent ({
       isQuestionTime,
       currentQuestion,
       currentFeedback,
-      activeButton,
+      activeButton
     };
-  },
+  }
 });
 </script>
-<style>
-</style>
+<style></style>
