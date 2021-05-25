@@ -40,7 +40,7 @@ export default function quiz(Questions: Question[]) {
   const { state, send } = useMachine(QuizMachine, { devTools: true });
 
   // user answer to true/false question
-  const picked = ref<boolean | null>(null);
+  const picked = ref<boolean | null>();
 
   // show question if the following states don't matche
   const isQuestionTime = computed<boolean>(
@@ -98,7 +98,8 @@ export default function quiz(Questions: Question[]) {
     },
     {
       label: "ANSWER",
-      cond: state => state.value.matches("answering.idle"),
+      // cond: state => state.value.matches("answering.idle"),
+      cond: state => ["answering.idle", "answering.problem"].some(state.value.matches),
       action: () =>
         send({
           type: "ANSWER",

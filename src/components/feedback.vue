@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding-top: 20px;">
     <component
       v-if="currentFeedback"
       :key="state.value.value"

@@ -62,6 +62,14 @@ const NEXT_Q = [
   { target: "finish" }
 ];
 
+const CHECK_ANSWER = {
+  exit: ["clearErrorMessage"],
+  on: {
+    ANSWER: {
+      target: "submitting",
+    }
+  }
+}
 export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
   {
     id: "quiz",
@@ -90,14 +98,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
           target: "checking"
         },
         states: {
-          idle: {
-            exit: ["clearErrorMessage"],
-            on: {
-              ANSWER: {
-                target: "submitting",
-              }
-            }
-          },
+          idle: CHECK_ANSWER,
           submitting: {
             invoke: {
               src: validateAnswer,
@@ -109,7 +110,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
                 })
               },
               onError: {
-                target: "idle",
+                target: "problem",
                 actions: assign<QuizContext, DoneInvokeEvent<any>>((context, event) => {
                     return {
                       errorMessage: event.data.message
@@ -118,6 +119,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
               }
             }
           },
+          problem: CHECK_ANSWER,
           complete: {
             type: "final"
           }

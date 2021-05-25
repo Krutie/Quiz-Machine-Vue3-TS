@@ -1,8 +1,9 @@
 <template>
   <div id="quiz">
     <h2>Quiz Machine - v5 - TS</h2>
+    <code>state: {{ state.value }} </code>
+
     <div class="box">
-      state: {{ state.value }}
       <!-- feedback emojis -->
       <feedback :state="state" :currentFeedback="currentFeedback" />
 
