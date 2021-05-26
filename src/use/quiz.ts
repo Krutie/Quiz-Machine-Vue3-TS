@@ -15,25 +15,6 @@ import {
   correct
 } from "../components/feedback-components/";
 
-// INTERFACE
-
-// interface Question {
-//   text: string;
-//   answer: boolean;
-// }
-// interface Action {
-//   label: string;
-//   cond: (state: any) => any;
-//   action: () => void;
-// }
-
-// interface Feedback {
-//   state: string;
-//   mood: Component;
-//   color: string;
-// }
-// ==============
-
 export default function quiz(Questions: Question[]) {
   // initialise xstate machine
   const { state, send } = useMachine(QuizMachine, { devTools: true });
