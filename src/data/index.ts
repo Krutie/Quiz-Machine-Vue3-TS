@@ -1,7 +1,4 @@
-export interface Question {
-  text: string;
-  answer: boolean;
-}
+import { Question } from "../types/";
 
 const questions: Question[] = [
   {

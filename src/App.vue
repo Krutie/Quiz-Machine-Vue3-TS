@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { defineComponent, toRefs } from "vue";
+import { defineComponent } from "vue";
 
 // child components
 import instructions from "./components/instructions.vue";

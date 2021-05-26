@@ -1,11 +1,10 @@
 /* eslint-disable */
-import { ref, computed, watchEffect, Component } from "vue";
+import { ref, computed, watchEffect } from "vue";
 
 // XSTATE
 import { useMachine } from "@xstate/vue";
-import { QuizMachine, QuizEvent, QuizState, QuizContext } from "../machines/QuizMachine";
-import { Typestate  } from 'xstate';
-
+import { QuizEvent, Question, Action, Feedback } from "../types/";
+import { QuizMachine } from "../machines/QuizMachine";
 
 // Feedback (Vue) components
 import {
@@ -18,21 +17,21 @@ import {
 
 // INTERFACE
 
-interface Question {
-  text: string;
-  answer: boolean;
-}
-interface Action {
-  label: string;
-  cond: (state: any) => any;
-  action: () => void;
-}
+// interface Question {
+//   text: string;
+//   answer: boolean;
+// }
+// interface Action {
+//   label: string;
+//   cond: (state: any) => any;
+//   action: () => void;
+// }
 
-interface Feedback {
-  state: string;
-  mood: Component;
-  color: string;
-}
+// interface Feedback {
+//   state: string;
+//   mood: Component;
+//   color: string;
+// }
 // ==============
 
 export default function quiz(Questions: Question[]) {
