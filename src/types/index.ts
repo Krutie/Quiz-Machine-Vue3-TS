@@ -1,5 +1,6 @@
 // import { StateSchema, DoneInvokeEvent } from "xstate";
 import { Component } from "vue";
+import { State } from "xstate";
 
 export interface Answer {
   picked: boolean | null;
@@ -13,7 +14,8 @@ export interface Question {
 export interface Action {
   label: string;
   cond: (state: any) => any;
-  action: () => void;
+  // action: () => void;
+  action: () => State<QuizContext, QuizEvent, QuizState> | undefined;
 }
 
 export interface Feedback {

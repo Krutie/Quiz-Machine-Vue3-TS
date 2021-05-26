@@ -78,14 +78,13 @@ export default function quiz(Questions: Question[]) {
     },
     {
       label: "ANSWER",
-      // cond: state => state.value.matches("answering.idle"),
       cond: state => ["answering.idle", "answering.problem"].some(state.value.matches),
       action: () =>
-        send({
-          type: "ANSWER",
-          answer: {
-            picked: picked.value,
-            value: currentQuestion.value.answer
+        send({ 
+          type: "ANSWER", 
+          answer: { 
+            picked: picked.value, 
+            value: currentQuestion.value.answer 
           }
         } as QuizEvent)
     },
@@ -97,7 +96,16 @@ export default function quiz(Questions: Question[]) {
   ];
 
   // show active button based on state value
-  const activeButton = computed<Action | undefined>(() => actions.find(action => action.cond(state)));
+  // const activeButton = computed(() => actions.find(action => action.cond(state) as Action));
+  const activeButton = computed(() => {
+    
+    const action = actions.find(action => action.cond(state))
+    if(action) {
+      return action
+    } else {
+      return;
+    }
+  });
 
   // return properties and methods to control the UI
   return {

@@ -1,17 +1,19 @@
 <template>
   <div class="score">
     <div class="count correct">
-      {{ score.correct }}
+      {{ correct }}
     </div>
     <div class="count incorrect">
-      {{ score.incorrect }}
+      {{ incorrect }}
     </div>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { defineComponent } from "vue";
-
 export default defineComponent({
-  props: ["score"]
+  props: {
+    correct: Number,
+    incorrect: Number
+  }
 });
 </script>

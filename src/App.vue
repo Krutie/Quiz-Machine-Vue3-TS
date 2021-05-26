@@ -40,7 +40,10 @@
     </div>
 
     <!-- SCORE -->
-    <score :score="state.context" />
+    <score
+      :correct="state.context.correct"
+      :incorrect="state.context.incorrect"
+    />
   </div>
 </template>
 

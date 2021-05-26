@@ -39,6 +39,7 @@ export const QuizMachine = createMachine<QuizContext, QuizEvent, QuizState>(
       correct: 0,
       incorrect: 0,
       errorMessage: "",
+      answer: undefined,
       totalQuestions: 0,
     },
     states: {

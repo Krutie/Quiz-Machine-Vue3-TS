@@ -7,10 +7,16 @@
     Congratulations! You finished.
   </div>
 </template>
-<script>
-import { defineComponent } from "vue";
-
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { QuizContext, QuizEvent, QuizState } from "../types/index";
+import { State } from "xstate";
 export default defineComponent({
-  props: ["state"]
+  props: {
+    state: {
+      type: Object as PropType<State<QuizContext, QuizEvent, QuizState>>,
+      required: true
+    }
+  }
 });
 </script>
