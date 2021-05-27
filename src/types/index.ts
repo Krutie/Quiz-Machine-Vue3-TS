@@ -1,4 +1,4 @@
-// import { StateSchema, DoneInvokeEvent } from "xstate";
+import component from "*.vue";
 import { Component } from "vue";
 import { State } from "xstate";
 
@@ -15,12 +15,12 @@ export interface Action {
   label: string;
   cond: (state: any) => any;
   // action: () => void;
-  action: () => State<QuizContext, QuizEvent, QuizState> | undefined;
+  action: () => State<QuizContext, QuizEvent, QuizState>;
 }
 
 export interface Feedback {
   state: string;
-  mood: Component;
+  mood: any;
   color: string;
 }
 

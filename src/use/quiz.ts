@@ -56,7 +56,7 @@ export default function quiz(Questions: Question[]) {
     { state: "finish", mood: finish, color: "#a27ae8" }
   ];
 
-  const currentFeedback = computed<Feedback>(() => {
+  const currentFeedback = computed(() => {
     const matched = newFeedbackMap.filter(feedback =>
       state.value.toStrings().includes(feedback.state)
     );
@@ -96,16 +96,7 @@ export default function quiz(Questions: Question[]) {
   ];
 
   // show active button based on state value
-  // const activeButton = computed(() => actions.find(action => action.cond(state) as Action));
-  const activeButton = computed(() => {
-    
-    const action = actions.find(action => action.cond(state))
-    if(action) {
-      return action
-    } else {
-      return;
-    }
-  });
+  const activeButton = computed(() => actions.find(action => action.cond(state)) || actions[0]);
 
   // return properties and methods to control the UI
   return {

@@ -5,7 +5,7 @@
 
     <div class="box">
       <!-- feedback emojis -->
-      <feedback :state="state" :currentFeedback="currentFeedback" />
+      <feedback :currentFeedback="currentFeedback" />
 
       <!-- instructions -->
       <instructions :state="state" />

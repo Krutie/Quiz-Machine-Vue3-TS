@@ -1,25 +1,21 @@
 <template>
-  <div style="padding-top: 20px;" v-if="currentFeedback">
+  <div style="padding-top: 20px;">
     <component
-      :is="currentFeedback.mood"
-      :key="state.value"
+      v-if="currentFeedback"
+      v-bind:is="currentFeedback.mood"
+      :key="currentFeedback.state"
       class="feedback"
     ></component>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-// import { Feedback } from "../types/index";
-import { QuizContext, QuizEvent, QuizState } from "../types/index";
-import { State } from "xstate";
+import { Feedback } from "../types/index";
+
 export default defineComponent({
   props: {
-    state: {
-      type: Object as PropType<State<QuizContext, QuizEvent, QuizState>>,
-      required: true
-    },
     currentFeedback: {
-      type: Object, // as PropType<Feedback>,
+      type: Object as PropType<Feedback>,
       required: true
     }
   }
